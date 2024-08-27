@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS AI Assistant Demo</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+        #ehs-assistant-demo {
+            width: 600px;
+            height: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="ehs-assistant-demo"></div>
+
+    <script type="text/babel">
+        import React, { useState, useEffect, useRef } from 'react';
+
+const AutoDemoTerminalAIAssistant = () => {
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState([
+    { type: 'output', content: 'Gerty EHS AI Assistant v1.0.0 [Light PowerShell Edition]' },
+    { type: 'output', content: 'Type "help" for a list of commands.' },
+  ]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [demoIndex, setDemoIndex] = useState(0);
+  const bottomRef = useRef(null);
+
+  const demoCommands = [
+    'analyze-risk "Working at heights without proper fall protection"',
+    'safety-checklist "Chemical storage area"',
+    'incident-report "Minor chemical spill in lab 3"',
+    'emergency-procedure "Fire in the warehouse"',
+    'ppe-requirements "Welding operations"',
+    'environmental-impact "New manufacturing process"',
+  ];
+
+  const demoResponses = {
+    'analyze-risk': `Risk Analysis Result:
+- Risk Level: High
+- Potential Consequences: Severe injury or fatality
+- Recommended Controls: 
+  1. Use proper fall protection equipment
+  2. Implement guardrails
+  3. Provide comprehensive safety training
+  4. Conduct regular equipment inspections`,
+    'safety-checklist': `Chemical Storage Area Safety Checklist:
+1. Proper ventilation system in place
+2. Safety Data Sheets (SDS) readily available
+3. Appropriate personal protective equipment (PPE) accessible
+4. Spill containment measures implemented
+5. Incompatible chemicals stored separately
+6. Emergency shower and eyewash stations nearby
+7. Fire suppression system operational`,
+    'incident-report': `Incident Report Generated:
+- Incident: Minor chemical spill in Lab 3
+- Date/Time: [Current Date/Time]
+- Actions Taken: 
+  1. Area cordoned off
+  2. Spill kit used
+  3. Affected personnel examined
+- Follow-up: 
+  1. Review chemical handling procedures
+  2. Refresh staff training
+  3. Inspect and upgrade containment measures if necessary`,
+    'emergency-procedure': `Emergency Procedure for Warehouse Fire:
+1. Activate fire alarm
+2. Evacuate all personnel to designated assembly points
+3. Call emergency services (911)
+4. If safe, use fire extinguishers on small fires
+5. Account for all personnel
+6. Provide first aid if needed
+7. Cooperate with emergency responders
+8. Do not re-enter the building until authorized`,
+    'ppe-requirements': `PPE Requirements for Welding Operations:
+1. Welding helmet with appropriate shade lens
+2. Fire-resistant welding jacket or sleeves
+3. Leather welding gloves
+4. Safety glasses with side shields (under helmet)
+5. Steel-toed safety boots
+6. Flame-resistant pants without cuffs
+7. Respiratory protection if working in confined spaces
+8. Hearing protection (earplugs or earmuffs)`,
+    'environmental-impact': `Environmental Impact Assessment for New Manufacturing Process:
+1. Air Quality: Potential increase in emissions
+   - Recommendation: Install advanced filtration systems
+2. Water Usage: Higher consumption expected
+   - Recommendation: Implement water recycling technologies
+3. Waste Generation: New types of waste materials
+   - Recommendation: Develop comprehensive recycling program
+4. Energy Consumption: Increased power requirements
+   - Recommendation: Invest in energy-efficient equipment and renewable energy sources
+5. Noise Pollution: Possible increase in noise levels
+   - Recommendation: Install sound barriers and use noise-reducing technologies
+6. Overall Impact: Moderate - Mitigation measures required`
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
+
+  useEffect(() => {
+    const demoInterval = setInterval(() => {
+      const command = demoCommands[demoIndex];
+      setHistory(prev => [...prev, { type: 'input', content: command }]);
+      
+      setTimeout(() => {
+        const responseKey = command.split(' ')[0];
+        const response = demoResponses[responseKey];
+        setHistory(prev => [...prev, { type: 'output', content: response }]);
+      }, 1000);
+
+      setDemoIndex((prevIndex) => (prevIndex + 1) % demoCommands.length);
+    }, 5000);
+
+    return () => clearInterval(demoInterval);
+  }, [demoIndex]);
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
+  return (
+    <div className="bg-white text-black font-mono text-xs leading-tight h-screen flex flex-col" style={{fontFamily: "'Courier New', Courier, monospace"}}>
+      {/* Header */}
+      <div className="bg-[#F0F0F0] px-2 py-0.5 flex items-center text-[10px] border-b border-gray-300">
+        <span className="bg-[#0078D4] text-white px-0.5 mr-1">⍰</span>
+        <span className="flex-grow">C:\Users\Gerty\EHS-Assistant</span>
+        <span className="bg-[#16C60C] text-white px-0.5 ml-1">ˇ</span>
+        <span className="ml-0.5">main</span>
+        <span className="ml-1">≡</span>
+        <span className="text-[#16C60C] ml-0.5">+15</span>
+        <span className="text-[#C50F1F] ml-0.5">~2 -14</span>
+      </div>
+
+      {/* Content */}
+      <div className="flex-grow p-1 overflow-auto">
+        {history.map((item, index) => (
+          <div key={index} className="mb-1">
+            {item.type === 'input' && <p style={{color: '#8B4513'}}>> {item.content}</p>}
+            {item.type === 'output' && <div className="mt-0.5 whitespace-pre-wrap">{item.content}</div>}
+          </div>
+        ))}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Footer */}
+      <div className="bg-[#F0F0F0] px-2 py-0.5 flex justify-between items-center text-[10px] border-t border-gray-300">
+        <span className="bg-[#881798] text-white px-0.5">⍰</span>
+        <span className="ml-1">C:\Users\Gerty\EHS-Assistant</span>
+        <span className="bg-[#16C60C] text-white px-0.5 ml-1">ˇ</span>
+        <span className="ml-0.5">main</span>
+        <span className="ml-1">≡</span>
+        <span className="text-[#16C60C] ml-0.5">+15</span>
+        <span className="text-[#C50F1F] ml-0.5">~2 -14</span>
+        <span className="flex-grow"></span>
+        <span className="bg-[#881798] text-white px-0.5">@ 32%</span>
+        <span className="ml-1 text-[#0078D4]">16.15.0</span>
+        <span className="ml-1">{formatTime(currentTime)}</span>
+      </div>
+    </div>
+  );
+};
+
+export default AutoDemoTerminalAIAssistant;
+        const AutoDemoTerminalAIAssistant = () => {
+            import React, { useState, useEffect, useRef } from 'react';
+
+const AutoDemoTerminalAIAssistant = () => {
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState([
+    { type: 'output', content: 'Gerty EHS AI Assistant v1.0.0 [Light PowerShell Edition]' },
+    { type: 'output', content: 'Type "help" for a list of commands.' },
+  ]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [demoIndex, setDemoIndex] = useState(0);
+  const bottomRef = useRef(null);
+
+  const demoCommands = [
+    'analyze-risk "Working at heights without proper fall protection"',
+    'safety-checklist "Chemical storage area"',
+    'incident-report "Minor chemical spill in lab 3"',
+    'emergency-procedure "Fire in the warehouse"',
+    'ppe-requirements "Welding operations"',
+    'environmental-impact "New manufacturing process"',
+  ];
+
+  const demoResponses = {
+    'analyze-risk': `Risk Analysis Result:
+- Risk Level: High
+- Potential Consequences: Severe injury or fatality
+- Recommended Controls: 
+  1. Use proper fall protection equipment
+  2. Implement guardrails
+  3. Provide comprehensive safety training
+  4. Conduct regular equipment inspections`,
+    'safety-checklist': `Chemical Storage Area Safety Checklist:
+1. Proper ventilation system in place
+2. Safety Data Sheets (SDS) readily available
+3. Appropriate personal protective equipment (PPE) accessible
+4. Spill containment measures implemented
+5. Incompatible chemicals stored separately
+6. Emergency shower and eyewash stations nearby
+7. Fire suppression system operational`,
+    'incident-report': `Incident Report Generated:
+- Incident: Minor chemical spill in Lab 3
+- Date/Time: [Current Date/Time]
+- Actions Taken: 
+  1. Area cordoned off
+  2. Spill kit used
+  3. Affected personnel examined
+- Follow-up: 
+  1. Review chemical handling procedures
+  2. Refresh staff training
+  3. Inspect and upgrade containment measures if necessary`,
+    'emergency-procedure': `Emergency Procedure for Warehouse Fire:
+1. Activate fire alarm
+2. Evacuate all personnel to designated assembly points
+3. Call emergency services (911)
+4. If safe, use fire extinguishers on small fires
+5. Account for all personnel
+6. Provide first aid if needed
+7. Cooperate with emergency responders
+8. Do not re-enter the building until authorized`,
+    'ppe-requirements': `PPE Requirements for Welding Operations:
+1. Welding helmet with appropriate shade lens
+2. Fire-resistant welding jacket or sleeves
+3. Leather welding gloves
+4. Safety glasses with side shields (under helmet)
+5. Steel-toed safety boots
+6. Flame-resistant pants without cuffs
+7. Respiratory protection if working in confined spaces
+8. Hearing protection (earplugs or earmuffs)`,
+    'environmental-impact': `Environmental Impact Assessment for New Manufacturing Process:
+1. Air Quality: Potential increase in emissions
+   - Recommendation: Install advanced filtration systems
+2. Water Usage: Higher consumption expected
+   - Recommendation: Implement water recycling technologies
+3. Waste Generation: New types of waste materials
+   - Recommendation: Develop comprehensive recycling program
+4. Energy Consumption: Increased power requirements
+   - Recommendation: Invest in energy-efficient equipment and renewable energy sources
+5. Noise Pollution: Possible increase in noise levels
+   - Recommendation: Install sound barriers and use noise-reducing technologies
+6. Overall Impact: Moderate - Mitigation measures required`
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
+
+  useEffect(() => {
+    const demoInterval = setInterval(() => {
+      const command = demoCommands[demoIndex];
+      setHistory(prev => [...prev, { type: 'input', content: command }]);
+      
+      setTimeout(() => {
+        const responseKey = command.split(' ')[0];
+        const response = demoResponses[responseKey];
+        setHistory(prev => [...prev, { type: 'output', content: response }]);
+      }, 1000);
+
+      setDemoIndex((prevIndex) => (prevIndex + 1) % demoCommands.length);
+    }, 5000);
+
+    return () => clearInterval(demoInterval);
+  }, [demoIndex]);
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
+  return (
+    <div className="bg-white text-black font-mono text-xs leading-tight h-screen flex flex-col" style={{fontFamily: "'Courier New', Courier, monospace"}}>
+      {/* Header */}
+      <div className="bg-[#F0F0F0] px-2 py-0.5 flex items-center text-[10px] border-b border-gray-300">
+        <span className="bg-[#0078D4] text-white px-0.5 mr-1">⍰</span>
+        <span className="flex-grow">C:\Users\Gerty\EHS-Assistant</span>
+        <span className="bg-[#16C60C] text-white px-0.5 ml-1">ˇ</span>
+        <span className="ml-0.5">main</span>
+        <span className="ml-1">≡</span>
+        <span className="text-[#16C60C] ml-0.5">+15</span>
+        <span className="text-[#C50F1F] ml-0.5">~2 -14</span>
+      </div>
+
+      {/* Content */}
+      <div className="flex-grow p-1 overflow-auto">
+        {history.map((item, index) => (
+          <div key={index} className="mb-1">
+            {item.type === 'input' && <p style={{color: '#8B4513'}}>> {item.content}</p>}
+            {item.type === 'output' && <div className="mt-0.5 whitespace-pre-wrap">{item.content}</div>}
+          </div>
+        ))}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Footer */}
+      <div className="bg-[#F0F0F0] px-2 py-0.5 flex justify-between items-center text-[10px] border-t border-gray-300">
+        <span className="bg-[#881798] text-white px-0.5">⍰</span>
+        <span className="ml-1">C:\Users\Gerty\EHS-Assistant</span>
+        <span className="bg-[#16C60C] text-white px-0.5 ml-1">ˇ</span>
+        <span className="ml-0.5">main</span>
+        <span className="ml-1">≡</span>
+        <span className="text-[#16C60C] ml-0.5">+15</span>
+        <span className="text-[#C50F1F] ml-0.5">~2 -14</span>
+        <span className="flex-grow"></span>
+        <span className="bg-[#881798] text-white px-0.5">@ 32%</span>
+        <span className="ml-1 text-[#0078D4]">16.15.0</span>
+        <span className="ml-1">{formatTime(currentTime)}</span>
+      </div>
+    </div>
+  );
+};
+
+export default AutoDemoTerminalAIAssistant;
+        };
+
+        ReactDOM.render(<AutoDemoTerminalAIAssistant />, document.getElementById('ehs-assistant-demo'));
+    </script>
+</body>
+</html>
