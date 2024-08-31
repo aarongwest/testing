@@ -34,7 +34,7 @@
             ]);
             const [currentTime, setCurrentTime] = React.useState(new Date());
             const [demoIndex, setDemoIndex] = React.useState(0);
-            const bottomRef = React.useRef(null);
+            const contentRef = React.useRef(null);
 
             const demoCommands = [
                 'analyze-risk "Working at heights without proper fall protection"',
@@ -72,8 +72,8 @@
             }, []);
 
             React.useEffect(() => {
-                if (bottomRef.current) {
-                    bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+                if (contentRef.current) {
+                    contentRef.current.scrollTop = contentRef.current.scrollHeight;
                 }
             }, [history]);
 
@@ -112,14 +112,13 @@
                     </div>
 
                     {/* Content */}
-                    <div style={{flexGrow: 1, padding: '4px', overflowY: 'auto'}}>
+                    <div ref={contentRef} style={{flexGrow: 1, padding: '4px', overflowY: 'auto'}}>
                         {history.map((item, index) => (
                             <div key={index} style={{marginBottom: '4px'}}>
                                 {item.type === 'input' && <p style={{color: '#8B4513'}}>> {item.content}</p>}
                                 {item.type === 'output' && <div style={{marginTop: '2px', whiteSpace: 'pre-wrap'}}>{item.content}</div>}
                             </div>
                         ))}
-                        <div ref={bottomRef} />
                     </div>
 
                     {/* Footer */}
